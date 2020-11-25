@@ -1,0 +1,12 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type": "blobTrigger",
+      "direction": "in",
+      "name": "newBlob",
+      "path": "users/{name}",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}

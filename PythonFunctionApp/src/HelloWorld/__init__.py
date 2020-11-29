@@ -17,7 +17,7 @@ def main(req, outputblob) -> func.HttpResponse:
 
   if name:
     # Create blob to be used by all tests
-    text_bytes = name.encode('utf-8')
+    text_bytes = name.encode('utf8')
     new_blob = func.blob.InputStream(data=text_bytes)
 
     outputblob.set(new_blob)

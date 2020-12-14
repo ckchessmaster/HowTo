@@ -42,3 +42,64 @@ stages:
       inputs:
         testResultsFiles: '$(workingDirectory)/**/test-*.xml'
         testRunTitle: 'Publish test results for Python $(python.version)'
+
+- stage: Build
+  displayName: Build
+  dependsOn: Test
+  condition: succeeded('Test')
+  jobs:
+  - job: Build
+    displayName: Build
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.8'
+      inputs:
+        versionSpec: 3.8
+
+    - bash: |
+        if [ -f extensions.csproj ]
+        then
+          dotnet build extensions.csproj -output
+        fi
+      workingDirectory: $(workingDirectory)
+      displayName: Build Extensions
+
+    - bash: |
+        pip install --upgrade pip
+        pip install --target=".python_packages/lib/site-packages" -r requirements.txt
+      displayName: Install Dependencies
+      workingDirectory: $(workingDirectory)
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(workingDirectory)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/ReleaseManagerFunctionApp$(Build.BuildId).zip
+        replaceExistingArchive: true
+
+    - publish: $(Build.ArtifactStagingDirectory)/ReleaseManagerFunctionApp$(Build.BuildId).zip
+      displayName: 'Upload Package'
+      artifact: func
+
+- stage: Deploy
+  displayName: Deploy
+  dependsOn: Build
+  condition: succeeded('Build')
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          
+          - task: AzureFunctionApp@1
+            displayName: 'Azure functions app deploy'
+            inputs:
+              azureSubscription: '$(subscription)'
+              appType: functionAppLinux
+              appName: $(functionAppName)
+              package: '$(Pipeline.Workspace)/func/ReleaseManagerFunctionApp$(Build.BuildId).zip'

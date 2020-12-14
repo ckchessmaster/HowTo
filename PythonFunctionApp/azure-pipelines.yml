@@ -1,19 +1,19 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - PythonFunctionApp/src/*
+
+variables:
+  subscription: '9fba6314-ec74-4f90-ae35-ffc7d68ceca4'
+  functionAppName: uan-fa-release-manager
+  vmImageName: 'ubuntu-latest'
+  workingDirectory: '$(System.DefaultWorkingDirectory)/PythonFunctionApp/src'
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: $(vmImageName)
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'

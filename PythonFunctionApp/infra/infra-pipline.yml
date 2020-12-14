@@ -40,5 +40,5 @@ stages:
         location: $(location)
         templateLocation: 'Linked artifact'
         deploymentMode: Incremental
-        csmFile: '$(Build.SourcesDirectory)/infra/pythonFunctionsDemoApp.json'
-        csmParametersFile: '$(Build.SourcesDirectory)/infra/pythonFunctionsDemoApp.parameters.json'
+        csmFile: '$(Build.SourcesDirectory)/PythonFunctionApp/infra/pythonFunctionsDemoApp.json'
+        csmParametersFile: '$(Build.SourcesDirectory)/PythonFunctionApp/infra/pythonFunctionsDemoApp.parameters.json'

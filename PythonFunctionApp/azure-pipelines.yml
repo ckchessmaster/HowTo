@@ -8,7 +8,7 @@ trigger:
     - PythonFunctionApp/src/*
 
 variables:
-  subscription: '9fba6314-ec74-4f90-ae35-ffc7d68ceca4'
+  subscription: ARM
   functionAppName: chrisDemoPythonApp
   vmImageName: 'ubuntu-latest'
   workingDirectory: '$(System.DefaultWorkingDirectory)/PythonFunctionApp/src'

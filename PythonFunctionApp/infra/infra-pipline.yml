@@ -1,0 +1,44 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - infra/*
+
+variables:
+  resourceGroup: chrisDemoResourceGroup 
+  location: eastus
+  subscription: 0cd1b4a4-98c0-48dd-900e-532a1f9a345c
+  vmImageName: 'ubuntu-latest'
+
+pool:
+  vmImage: $(vmImageName)
+
+stages:
+- stage: Deploy
+  jobs:
+  - job: DeployInfra
+    displayName: Deploy Release Manager Infrastructure
+    steps:
+    
+    - task: AzureCLI@2
+      displayName: Create Resource Group
+      inputs:
+        azureSubscription: azure-default
+        scriptType: pscore
+        scriptLocation: inlineScript
+        inlineScript: az group create --location $(location) --name $(resourceGroup) --subscription $(subscription)
+
+    - task: AzureResourceGroupDeployment@2
+      displayName: Create Release Management Infrastructure
+      inputs:
+        azureSubscription: azure-default
+        resourceGroupName: $(resourceGroup)
+        action: 'Create Or Update Resource Group'
+        location: $(location)
+        templateLocation: 'Linked artifact'
+        deploymentMode: Incremental
+        csmFile: '$(Build.SourcesDirectory)/infra/pythonFunctionsDemoApp.json'
+        csmParametersFile: '$(Build.SourcesDirectory)/infra/pythonFunctionsDemoApp.parameters.json'

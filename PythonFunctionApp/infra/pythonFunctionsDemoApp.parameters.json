@@ -1,3 +1,18 @@
 {
-  
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sites_chrisDemoFunctionApp_name": {
+      "value": "chrisDemoFunctionApp"
+    },
+    "serverfarms_EastUSLinuxDynamicPlan_name": {
+        "value": "EastUSLinuxDynamicPlan"
+    },
+    "components_chrisDemoFunctionApp_name": {
+        "value": "chrisDemoFunctionApp"
+    },
+    "storageAccounts_chrisdemostorage_name": {
+        "value": "chrisdemostorage"
+    }
+  }
 }

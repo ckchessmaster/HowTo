@@ -189,7 +189,7 @@
           "appSettings": [
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccount'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount')),'2019-06-01').keys[0].value)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_chrisdemostorage_name'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount')),'2019-06-01').keys[0].value)]"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",

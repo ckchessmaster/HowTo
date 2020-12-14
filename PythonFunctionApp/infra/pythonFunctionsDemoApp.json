@@ -2,334 +2,349 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "sites_chrisDemoFunctionApp_name": {
-          "defaultValue": "chrisDemoFunctionApp",
-          "type": "String"
-      },
-      "serverfarms_EastUSLinuxDynamicPlan_name": {
-          "defaultValue": "EastUSLinuxDynamicPlan",
-          "type": "String"
-      },
-      "components_chrisDemoFunctionApp_name": {
-          "defaultValue": "chrisDemoFunctionApp",
-          "type": "String"
-      },
-      "storageAccounts_chrisdemostorage_name": {
-          "defaultValue": "chrisdemostorage",
-          "type": "String"
-      }
+    "sites_chrisDemoFunctionApp_name": {
+      "defaultValue": "chrisDemoFunctionApp",
+      "type": "String"
+    },
+    "serverfarms_EastUSLinuxDynamicPlan_name": {
+      "defaultValue": "EastUSLinuxDynamicPlan",
+      "type": "String"
+    },
+    "components_chrisDemoFunctionApp_name": {
+      "defaultValue": "chrisDemoFunctionApp",
+      "type": "String"
+    },
+    "storageAccounts_chrisdemostorage_name": {
+      "defaultValue": "chrisdemostorage",
+      "type": "String"
+    }
   },
   "variables": {},
   "resources": [
-      {
-          "type": "microsoft.insights/components",
-          "apiVersion": "2018-05-01-preview",
-          "name": "[parameters('components_chrisDemoFunctionApp_name')]",
-          "location": "[resourceGroup().location]",
-          "kind": "web",
-          "properties": {
-              "Application_Type": "web",
-              "RetentionInDays": 90,
-              "publicNetworkAccessForIngestion": "Enabled",
-              "publicNetworkAccessForQuery": "Enabled"
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[parameters('storageAccounts_chrisdemostorage_name')]",
-          "location": "[resourceGroup().location]",
-          "sku": {
-              "name": "Standard_LRS",
-              "tier": "Standard"
-          },
-          "kind": "StorageV2",
-          "properties": {
-              "networkAcls": {
-                  "bypass": "AzureServices",
-                  "virtualNetworkRules": [],
-                  "ipRules": [],
-                  "defaultAction": "Allow"
-              },
-              "supportsHttpsTrafficOnly": true,
-              "encryption": {
-                  "services": {
-                      "file": {
-                          "keyType": "Account",
-                          "enabled": true
-                      },
-                      "blob": {
-                          "keyType": "Account",
-                          "enabled": true
-                      }
-                  },
-                  "keySource": "Microsoft.Storage"
-              },
-              "accessTier": "Hot"
-          }
-      },
-      {
-          "type": "Microsoft.Web/serverfarms",
-          "apiVersion": "2018-02-01",
-          "name": "[parameters('serverfarms_EastUSLinuxDynamicPlan_name')]",
-          "location": "[resourceGroup().location]",
-          "sku": {
-              "name": "Y1",
-              "tier": "Dynamic",
-              "size": "Y1",
-              "family": "Y",
-              "capacity": 0
-          },
-          "kind": "functionapp",
-          "properties": {
-              "perSiteScaling": false,
-              "maximumElasticWorkerCount": 1,
-              "isSpot": false,
-              "reserved": true,
-              "isXenon": false,
-              "hyperV": false,
-              "targetWorkerCount": 0,
-              "targetWorkerSizeId": 0
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/blobServices",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "sku": {
-              "name": "Standard_LRS",
-              "tier": "Standard"
-          },
-          "properties": {
-              "cors": {
-                  "corsRules": []
-              },
-              "deleteRetentionPolicy": {
-                  "enabled": false
-              }
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/fileServices",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "sku": {
-              "name": "Standard_LRS",
-              "tier": "Standard"
-          },
-          "properties": {
-              "protocolSettings": {
-                  "smb": {}
-              },
-              "cors": {
-                  "corsRules": []
-              }
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/queueServices",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "properties": {
-              "cors": {
-                  "corsRules": []
-              }
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/tableServices",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "properties": {
-              "cors": {
-                  "corsRules": []
-              }
-          }
-      },
-      {
-          "type": "Microsoft.Web/sites",
-          "apiVersion": "2018-11-01",
-          "name": "[parameters('sites_chrisDemoFunctionApp_name')]",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSLinuxDynamicPlan_name'))]"
-          ],
-          "kind": "functionapp,linux",
-          "properties": {
-              "enabled": true,
-              "hostNameSslStates": [
-                  {
-                      "name": "chrisdemofunctionapp.azurewebsites.net",
-                      "sslState": "Disabled",
-                      "hostType": "Standard"
-                  },
-                  {
-                      "name": "chrisdemofunctionapp.scm.azurewebsites.net",
-                      "sslState": "Disabled",
-                      "hostType": "Repository"
-                  }
-              ],
-              "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSLinuxDynamicPlan_name'))]",
-              "reserved": true,
-              "isXenon": false,
-              "hyperV": false,
-              "siteConfig": {},
-              "scmSiteAlsoStopped": false,
-              "clientAffinityEnabled": false,
-              "clientCertEnabled": false,
-              "hostNamesDisabled": false,
-              "containerSize": 0,
-              "dailyMemoryTimeQuota": 0,
-              "httpsOnly": false,
-              "redundancyMode": "None"
-          }
-      },
-      {
-          "type": "Microsoft.Web/sites/config",
-          "apiVersion": "2018-11-01",
-          "name": "[concat(parameters('sites_chrisDemoFunctionApp_name'), '/web')]",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', parameters('sites_chrisDemoFunctionApp_name'))]"
-          ],
-          "properties": {
-              "numberOfWorkers": 1,
-              "defaultDocuments": [
-                  "Default.htm",
-                  "Default.html",
-                  "Default.asp",
-                  "index.htm",
-                  "index.html",
-                  "iisstart.htm",
-                  "default.aspx",
-                  "index.php"
-              ],
-              "netFrameworkVersion": "v4.0",
-              "linuxFxVersion": "Python|3.8",
-              "requestTracingEnabled": false,
-              "remoteDebuggingEnabled": false,
-              "httpLoggingEnabled": false,
-              "logsDirectorySizeLimit": 35,
-              "detailedErrorLoggingEnabled": false,
-              "publishingUsername": "$chrisDemoFunctionApp",
-              "azureStorageAccounts": {},
-              "scmType": "None",
-              "use32BitWorkerProcess": false,
-              "webSocketsEnabled": false,
-              "alwaysOn": false,
-              "managedPipelineMode": "Integrated",
-              "virtualApplications": [
-                  {
-                      "virtualPath": "/",
-                      "physicalPath": "site\\wwwroot",
-                      "preloadEnabled": false
-                  }
-              ],
-              "loadBalancing": "LeastRequests",
-              "experiments": {
-                  "rampUpRules": []
-              },
-              "autoHealEnabled": false,
-              "cors": {
-                  "allowedOrigins": [
-                      "https://functions.azure.com",
-                      "https://functions-staging.azure.com",
-                      "https://functions-next.azure.com"
-                  ],
-                  "supportCredentials": false
-              },
-              "localMySqlEnabled": false,
-              "ipSecurityRestrictions": [
-                  {
-                      "ipAddress": "Any",
-                      "action": "Allow",
-                      "priority": 1,
-                      "name": "Allow all",
-                      "description": "Allow all access"
-                  }
-              ],
-              "scmIpSecurityRestrictions": [
-                  {
-                      "ipAddress": "Any",
-                      "action": "Allow",
-                      "priority": 1,
-                      "name": "Allow all",
-                      "description": "Allow all access"
-                  }
-              ],
-              "scmIpSecurityRestrictionsUseMain": false,
-              "http20Enabled": true,
-              "minTlsVersion": "1.2",
-              "ftpsState": "AllAllowed",
-              "reservedInstanceCount": 0
-          }
-      },
-      {
-          "type": "Microsoft.Web/sites/hostNameBindings",
-          "apiVersion": "2018-11-01",
-          "name": "[concat(parameters('sites_chrisDemoFunctionApp_name'), '/', parameters('sites_chrisDemoFunctionApp_name'), '.azurewebsites.net')]",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', parameters('sites_chrisDemoFunctionApp_name'))]"
-          ],
-          "properties": {
-              "siteName": "chrisDemoFunctionApp",
-              "hostNameType": "Verified"
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default/azure-webjobs-hosts')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_chrisdemostorage_name'), 'default')]",
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "properties": {
-              "defaultEncryptionScope": "$account-encryption-key",
-              "denyEncryptionScopeOverride": false,
-              "publicAccess": "None"
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default/azure-webjobs-secrets')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_chrisdemostorage_name'), 'default')]",
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "properties": {
-              "defaultEncryptionScope": "$account-encryption-key",
-              "denyEncryptionScopeOverride": false,
-              "publicAccess": "None"
-          }
-      },
-      {
-          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-          "apiVersion": "2020-08-01-preview",
-          "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default/scm-releases')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_chrisdemostorage_name'), 'default')]",
-              "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
-          ],
-          "properties": {
-              "defaultEncryptionScope": "$account-encryption-key",
-              "denyEncryptionScopeOverride": false,
-              "publicAccess": "None"
-          }
+    {
+      "type": "microsoft.insights/components",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[parameters('components_chrisDemoFunctionApp_name')]",
+      "location": "[resourceGroup().location]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "RetentionInDays": 90,
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
       }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[parameters('storageAccounts_chrisdemostorage_name')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "name": "[parameters('serverfarms_EastUSLinuxDynamicPlan_name')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Y1",
+        "tier": "Dynamic",
+        "size": "Y1",
+        "family": "Y",
+        "capacity": 0
+      },
+      "kind": "functionapp",
+      "properties": {
+        "perSiteScaling": false,
+        "maximumElasticWorkerCount": 1,
+        "isSpot": false,
+        "reserved": true,
+        "isXenon": false,
+        "hyperV": false,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        },
+        "deleteRetentionPolicy": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "protocolSettings": {
+          "smb": {}
+        },
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "name": "[parameters('sites_chrisDemoFunctionApp_name')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSLinuxDynamicPlan_name'))]"
+      ],
+      "kind": "functionapp,linux",
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "chrisdemofunctionapp.azurewebsites.net",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "chrisdemofunctionapp.scm.azurewebsites.net",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_EastUSLinuxDynamicPlan_name'))]",
+        "reserved": true,
+        "isXenon": false,
+        "hyperV": false,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccount'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount')),'2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            }
+          ]
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": false,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": false,
+        "redundancyMode": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('sites_chrisDemoFunctionApp_name'), '/web')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_chrisDemoFunctionApp_name'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php"
+        ],
+        "netFrameworkVersion": "v4.0",
+        "linuxFxVersion": "Python|3.8",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "$chrisDemoFunctionApp",
+        "azureStorageAccounts": {},
+        "scmType": "None",
+        "use32BitWorkerProcess": false,
+        "webSocketsEnabled": false,
+        "alwaysOn": false,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "cors": {
+          "allowedOrigins": [
+            "https://functions.azure.com",
+            "https://functions-staging.azure.com",
+            "https://functions-next.azure.com"
+          ],
+          "supportCredentials": false
+        },
+        "localMySqlEnabled": false,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 1,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 1,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": true,
+        "minTlsVersion": "1.2",
+        "ftpsState": "AllAllowed",
+        "reservedInstanceCount": 0
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('sites_chrisDemoFunctionApp_name'), '/', parameters('sites_chrisDemoFunctionApp_name'), '.azurewebsites.net')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('sites_chrisDemoFunctionApp_name'))]"
+      ],
+      "properties": {
+        "siteName": "chrisDemoFunctionApp",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default/azure-webjobs-hosts')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_chrisdemostorage_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "properties": {
+        "defaultEncryptionScope": "$account-encryption-key",
+        "denyEncryptionScopeOverride": false,
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default/azure-webjobs-secrets')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_chrisdemostorage_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "properties": {
+        "defaultEncryptionScope": "$account-encryption-key",
+        "denyEncryptionScopeOverride": false,
+        "publicAccess": "None"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2020-08-01-preview",
+      "name": "[concat(parameters('storageAccounts_chrisdemostorage_name'), '/default/scm-releases')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_chrisdemostorage_name'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_chrisdemostorage_name'))]"
+      ],
+      "properties": {
+        "defaultEncryptionScope": "$account-encryption-key",
+        "denyEncryptionScopeOverride": false,
+        "publicAccess": "None"
+      }
+    }
   ]
 }

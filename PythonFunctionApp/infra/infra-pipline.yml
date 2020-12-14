@@ -26,7 +26,7 @@ stages:
     - task: AzureCLI@2
       displayName: Create Resource Group
       inputs:
-        azureSubscription: azure-default
+        azureSubscription: ARM
         scriptType: pscore
         scriptLocation: inlineScript
         inlineScript: az group create --location $(location) --name $(resourceGroup) --subscription $(subscription)
@@ -34,7 +34,7 @@ stages:
     - task: AzureResourceGroupDeployment@2
       displayName: Create Release Management Infrastructure
       inputs:
-        azureSubscription: azure-default
+        azureSubscription: ARM
         resourceGroupName: $(resourceGroup)
         action: 'Create Or Update Resource Group'
         location: $(location)

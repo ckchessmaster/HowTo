@@ -9,7 +9,7 @@ trigger:
 
 variables:
   subscription: '9fba6314-ec74-4f90-ae35-ffc7d68ceca4'
-  functionAppName: uan-fa-release-manager
+  functionAppName: chrisDemoPythonApp
   vmImageName: 'ubuntu-latest'
   workingDirectory: '$(System.DefaultWorkingDirectory)/PythonFunctionApp/src'
 
@@ -76,10 +76,10 @@ stages:
         rootFolderOrFile: '$(workingDirectory)'
         includeRootFolder: false
         archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/ReleaseManagerFunctionApp$(Build.BuildId).zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(functionAppName)$(Build.BuildId).zip
         replaceExistingArchive: true
 
-    - publish: $(Build.ArtifactStagingDirectory)/ReleaseManagerFunctionApp$(Build.BuildId).zip
+    - publish: $(Build.ArtifactStagingDirectory)/$(functionAppName)$(Build.BuildId).zip
       displayName: 'Upload Package'
       artifact: func
 
@@ -102,4 +102,4 @@ stages:
               azureSubscription: '$(subscription)'
               appType: functionAppLinux
               appName: $(functionAppName)
-              package: '$(Pipeline.Workspace)/func/ReleaseManagerFunctionApp$(Build.BuildId).zip'
+              package: '$(Pipeline.Workspace)/func/$(functionAppName)$(Build.BuildId).zip'

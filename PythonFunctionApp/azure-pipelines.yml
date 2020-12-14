@@ -16,4 +16,29 @@ variables:
 pool:
   vmImage: $(vmImageName)
 
+stages:
+- stage: Test
+  displayName: Test
+  jobs:
+  - job: UnitTest
+    displayName: UnitTest
+    steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.8'
+      inputs:
+        versionSpec: 3.8
 
+    - script: pip install -r requirements.txt
+      displayName: 'Install Dependencies'
+      workingDirectory: $(workingDirectory)
+
+    - script: pytest $(workingDirectory)/tests --doctest-modules --junitxml=junit/test-results.xml
+      displayName: Run Tests
+      workingDirectory: $(workingDirectory)
+
+    - task: PublishTestResults@2
+      displayName: Publish Test Results
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: '$(workingDirectory)/**/test-*.xml'
+        testRunTitle: 'Publish test results for Python $(python.version)'

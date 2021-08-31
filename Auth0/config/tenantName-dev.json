@@ -1,0 +1,19 @@
+{
+    "AUTH0_DOMAIN": "tenantName.us.auth0.com",
+    "AUTH0_EXPORT_IDENTIFIERS": false,
+    "AUTH0_KEYWORD_REPLACE_MAPPINGS": {
+        "AUTH0_TENANT_NAME": "tenantName"
+    },
+    "AUTH0_ALLOW_DELETE": false,
+    "AUTH0_EXCLUDED_CLIENTS": [
+        "Auth0 CICD"
+    ],
+    "EXCLUDED_PROPS": {
+        "clients": [
+            "client_secret"
+        ],
+        "connections": [
+            "options.client_secret"
+        ]
+    }
+}

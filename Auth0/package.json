@@ -1,0 +1,21 @@
+{
+  "name": "auth0",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dump": "node dump.js",
+    "deploy": "node deploy.js",
+    "clean": "rimraf dump"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "auth0-deploy-cli": "^7.2.1",
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2"
+  }
+}

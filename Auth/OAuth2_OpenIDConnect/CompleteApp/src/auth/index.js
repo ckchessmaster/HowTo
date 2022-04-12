@@ -1,5 +1,6 @@
 import AuthenticationModule from './authenticationModule';
 import config from './config'
+import { reactive } from 'vue'
 
 let instance
 
@@ -7,7 +8,7 @@ export const getInstance = () => instance;
 
 const useAuthPlugin = () => {
   if (!instance) {
-    instance = new AuthenticationModule(config.domain, config.clientId)
+    instance = reactive(new AuthenticationModule(config.domain, config.clientId))
   }
 
   return instance
@@ -15,6 +16,6 @@ const useAuthPlugin = () => {
 
 export default {
   install: (app, options) => {
-    app.config.globalProperties.$auth = useAuthPlugin()
+    app.provide('auth', useAuthPlugin())
   }
 }

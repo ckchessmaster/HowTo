@@ -16,32 +16,27 @@
   <RouterView v-if="!loading" />
 </template>
 
-<script>
+<script setup>
+import { computed, inject, watch, isReactive } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
 
-export default {
-  computed: {
-    loading() {
-      return this.$auth.loading
-    }
-  },
-  watch: {
-    '$auth.loading': {
-      handler(newValue, oldValue) {
-        console.log(`watcher: ${newValue}`)
-      },
-      deep: true
-    }
-  },
-  methods: {
-    async login() {
-      await this.$auth.login()
-    }
-  },
-  // async created() {
-  //   this.$auth.loading = false
-  // }
+const auth = inject('auth')
+
+console.log(isReactive(auth))
+
+console.log(auth)
+
+const loading = computed(() => {
+  return auth.loading
+})
+
+watch(auth.loading, (currentValue, oldValue) => {
+  console.log(`watcher: ${currentValue}`)
+})
+
+const login = async () => {
+  await auth.login()
 }
 </script>
 

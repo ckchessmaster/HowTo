@@ -9,7 +9,9 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
-      <button type="button" @click="login">Login</button>
+      <h1 v-if="isAuthenticated">Welcome, {{ user.firstName }}!</h1>
+      <button v-if="!isAuthenticated" type="button" @click="login">Login</button>
+      <button v-if="isAuthenticated" type="button" @click="logout">Logout</button>
     </div>
   </header>
 
@@ -21,13 +23,26 @@ import { computed, inject, onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
 
-const auth = inject('auth')
+const auth = inject('auth') // Pulling in the auth plugin
+
 const loading = computed(() => {
   return auth.loading
 })
 
+const isAuthenticated = computed(() => {
+  return auth.isAuthenticated
+})
+
+const user = computed(() => {
+  return auth.user
+})
+
 const login = async () => {
   await auth.login()
+}
+
+const logout = async () => {
+  await auth.logout()
 }
 </script>
 

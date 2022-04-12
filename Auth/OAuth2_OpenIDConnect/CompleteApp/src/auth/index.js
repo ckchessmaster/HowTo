@@ -8,10 +8,11 @@ export const getInstance = () => instance;
 
 const useAuthPlugin = () => {
   if (!instance) {
+    // We use the reactive() method here so that Vue can watch the properties of our auth module
     instance = reactive(new AuthenticationModule(config.domain, config.clientId))
   }
 
-  instance.init()
+  instance.init() // Firing off an async method to start getting stuff ready
 
   return instance
 }

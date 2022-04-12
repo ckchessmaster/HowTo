@@ -1,10 +1,5 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
+  <header v-if="!loading">
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
@@ -14,11 +9,31 @@ import HelloWorld from '@/components/HelloWorld.vue'
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
+      <button type="button" @click="login">Login</button>
     </div>
   </header>
 
-  <RouterView />
+  <RouterView v-if="!loading" />
 </template>
+
+<script>
+import { RouterLink, RouterView } from 'vue-router'
+import HelloWorld from '@/components/HelloWorld.vue'
+
+export default {
+  computed: {
+    loading() {
+      console.log(this.$auth.loading)
+      return this.$auth.loading
+    }
+  },
+  methods: {
+    async login() {
+      await this.$auth.login()
+    }
+  }
+}
+</script>
 
 <style>
 @import '@/assets/base.css';

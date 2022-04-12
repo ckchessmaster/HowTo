@@ -1,3 +1,6 @@
+# Sensitive Files
+src/auth/config.js
+
 # Logs
 logs
 *.log

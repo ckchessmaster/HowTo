@@ -23,15 +23,25 @@ import HelloWorld from '@/components/HelloWorld.vue'
 export default {
   computed: {
     loading() {
-      console.log(this.$auth.loading)
       return this.$auth.loading
+    }
+  },
+  watch: {
+    '$auth.loading': {
+      handler(newValue, oldValue) {
+        console.log(`watcher: ${newValue}`)
+      },
+      deep: true
     }
   },
   methods: {
     async login() {
       await this.$auth.login()
     }
-  }
+  },
+  // async created() {
+  //   this.$auth.loading = false
+  // }
 }
 </script>
 

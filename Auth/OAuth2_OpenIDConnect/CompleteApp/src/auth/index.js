@@ -11,6 +11,8 @@ const useAuthPlugin = () => {
     instance = reactive(new AuthenticationModule(config.domain, config.clientId))
   }
 
+  instance.init()
+
   return instance
 }
 

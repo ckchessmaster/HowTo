@@ -17,22 +17,13 @@
 </template>
 
 <script setup>
-import { computed, inject, watch, isReactive } from 'vue'
+import { computed, inject, onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
 
 const auth = inject('auth')
-
-console.log(isReactive(auth))
-
-console.log(auth)
-
 const loading = computed(() => {
   return auth.loading
-})
-
-watch(auth.loading, (currentValue, oldValue) => {
-  console.log(`watcher: ${currentValue}`)
 })
 
 const login = async () => {

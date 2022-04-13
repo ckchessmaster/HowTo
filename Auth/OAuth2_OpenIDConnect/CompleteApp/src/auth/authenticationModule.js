@@ -2,6 +2,7 @@ import axios from 'axios'
 import { nanoid } from 'nanoid'
 import cryptojs from 'crypto-js'
 import jwt_decode from "jwt-decode"
+import router from '@/router'
 
 const codeVerifierName = 'demoCodeVerifier'
 
@@ -21,8 +22,9 @@ export default class AuthenticationModule {
     this.openidConfig = configResponse.data
 
     const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.has('code')) {
+    if (urlParams.has('code') && urlParams.has('state')) {
       const code = urlParams.get('code')
+      const state = JSON.parse(decodeURIComponent(urlParams.get('state')))
 
       const tokenRequestOptions = {
         method: 'POST',
@@ -45,12 +47,16 @@ export default class AuthenticationModule {
       this.isAuthenticated = true
 
       this.user = this.getUserInfoFromIdToken(this.idToken)
+
+      router.push(state.targetUrl
+        ? state.targetUrl
+        : window.location.pathname)
     }
 
     this.loading = false
   }
 
-  async login() {
+  async login(options) {
     const codeVerifier = nanoid(64)
     sessionStorage.setItem(codeVerifierName, codeVerifier) // Save the code verifier for when we come back from the login
 
@@ -63,6 +69,14 @@ export default class AuthenticationModule {
     loginUrl.searchParams.append('scope', 'openid profile email')
     loginUrl.searchParams.append('code_challenge', codeChallenge)
     loginUrl.searchParams.append('code_challenge_method', 'S256')
+
+    let appState = {}
+    if (options && options.appState) {
+      appState = options.appState
+    }
+
+    const encodedAppState = encodeURIComponent(JSON.stringify(appState))
+    loginUrl.searchParams.append('state', encodedAppState)
     
     window.location.href = loginUrl.href
   }

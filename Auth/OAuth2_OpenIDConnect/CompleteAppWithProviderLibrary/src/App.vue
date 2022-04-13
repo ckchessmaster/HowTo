@@ -1,5 +1,10 @@
+<script setup>
+import { RouterLink, RouterView } from 'vue-router'
+import HelloWorld from '@/components/HelloWorld.vue'
+</script>
+
 <template>
-  <header v-if="!loading">
+  <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
@@ -9,42 +14,11 @@
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
-      <h1 v-if="isAuthenticated">Welcome, {{ user.firstName }}!</h1>
-      <button v-if="!isAuthenticated" type="button" @click="login">Login</button>
-      <button v-if="isAuthenticated" type="button" @click="logout">Logout</button>
     </div>
   </header>
 
-  <RouterView v-if="!loading" />
+  <RouterView />
 </template>
-
-<script setup>
-import { computed, inject } from 'vue'
-import { RouterLink, RouterView,  } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
-
-const auth = inject('auth') // Pulling in the auth plugin
-
-const loading = computed(() => {
-  return auth.loading
-})
-
-const isAuthenticated = computed(() => {
-  return auth.isAuthenticated
-})
-
-const user = computed(() => {
-  return auth.user
-})
-
-const login = async () => {
-  await auth.login()
-}
-
-const logout = async () => {
-  await auth.logout()
-}
-</script>
 
 <style>
 @import '@/assets/base.css';

@@ -5,7 +5,7 @@ import auth from './auth'
 
 const app = createApp(App)
 
-app.use(auth)
 app.use(router)
+app.use(auth)
 
 app.mount('#app')

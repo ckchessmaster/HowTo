@@ -1,8 +1,3 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
-</script>
-
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
@@ -14,11 +9,30 @@ import HelloWorld from '@/components/HelloWorld.vue'
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
+      <h1 v-if="isAuthenticated">Welcome, {{ user.given_name }}!</h1>
+      <button v-if="!isAuthenticated" @click="login">Log in</button>
+      <button v-if="isAuthenticated" @click="logout2">Log out</button>
     </div>
   </header>
 
   <RouterView />
 </template>
+
+<script setup>
+import { RouterLink, RouterView } from 'vue-router'
+import HelloWorld from '@/components/HelloWorld.vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+
+const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0()
+
+const login = () => {
+  loginWithRedirect()
+}
+
+const logout2 = () => {
+  logout({ returnTo: window.location.origin })
+}
+</script>
 
 <style>
 @import '@/assets/base.css';

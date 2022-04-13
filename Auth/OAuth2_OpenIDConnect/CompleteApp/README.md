@@ -1,6 +1,7 @@
 # CompleteApp
 
 This template should help get you started developing with Vue 3 in Vite.
+See here for more details: https://github.com/auth0/auth0-vue
 
 ## Recommended IDE Setup
 

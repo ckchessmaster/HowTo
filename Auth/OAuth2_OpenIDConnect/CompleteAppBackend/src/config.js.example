@@ -1,0 +1,5 @@
+export default {
+  domain: '<your-domain>.us.auth0.com',
+  audience: '<Your API's audience>',
+  issuer: 'https://<your-domain>.us.auth0.com/'
+}

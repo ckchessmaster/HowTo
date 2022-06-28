@@ -1,0 +1,7 @@
+export default {
+  auth0: {
+    domain: '<your-domain>.us.auth0.com',
+    audience: '<Your API's audience>',
+    customClaimNamespace: 'https://<your-domain>.us.auth0.com/'
+  }
+}

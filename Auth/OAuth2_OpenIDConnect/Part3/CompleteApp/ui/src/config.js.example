@@ -1,4 +1,7 @@
 export default {
   domain: '<your auth0 domain here>',
-  clientId: '<your auth0 apllication client id here>'
+  clientId: '<your auth0 apllication client id here>',
+  audience: '<your api audience here>',
+  apiBaseUrl: 'http://localhost:3000',
+  customNamespace: 'https://<your-custom-namespace>'
 }

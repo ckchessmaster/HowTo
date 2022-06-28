@@ -1,10 +1,102 @@
 <script setup>
+import { ref, onMounted, watch } from 'vue'
+import config from '@/config'
+import axios from 'axios'
+import { useAuth0 } from '@auth0/auth0-vue'
+
 import WelcomeItem from './WelcomeItem.vue'
 import DocumentationIcon from './icons/IconDocumentation.vue'
 import ToolingIcon from './icons/IconTooling.vue'
 import EcosystemIcon from './icons/IconEcosystem.vue'
 import CommunityIcon from './icons/IconCommunity.vue'
 import SupportIcon from './icons/IconSupport.vue'
+
+const { getAccessTokenSilently, isAuthenticated, user, isLoading } = useAuth0()
+
+let healthStatus = ref('Pending...')
+let secureRouteStatus = ref('Pending...')
+let adminOnlyStatus = ref('Pending...')
+
+async function getApiHealth() {
+  try {
+    const response = await axios.get(`${config.apiBaseUrl}/health`)
+    return response.data
+  } catch {
+    return 'Unhealthy'
+  }
+}
+
+async function getSecureRouteStatus() {
+  let accessToken 
+  
+  try {
+    accessToken = await getAccessTokenSilently()
+  } catch {}
+
+  try {
+    const response = await axios.get(`${config.apiBaseUrl}/secure-route`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    return response.data
+  } catch (e) {
+    if (e.response && e.response.status > 300) {
+      return e.response.data
+    }
+
+    return 'Unhealthy'
+  }
+}
+
+async function getAdminOnlyStatus() {
+  let accessToken 
+  
+  try {
+    accessToken = await getAccessTokenSilently()
+  } catch {}
+
+  try {
+    const response = await axios.get(`${config.apiBaseUrl}/admin-only`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    return response.data
+  } catch (e) {
+    if (e.response && e.response.status > 300) {
+      return e.response.data
+    }
+
+    return 'Unhealthy'
+  }
+}
+
+async function getStatuses() {
+  healthStatus.value = await getApiHealth()
+
+  if (isAuthenticated.value) {
+    secureRouteStatus.value = await getSecureRouteStatus()
+
+    const roles = user.value[`${config.customNamespace}/roles`]
+    
+    if(roles && roles.map(r => r.toLowerCase()).includes('admin')) {
+      adminOnlyStatus.value = await getAdminOnlyStatus()
+    } else {
+      adminOnlyStatus.value = 'Not an admin!'
+    }
+  } else {
+    secureRouteStatus.value = 'Not logged in.'
+    adminOnlyStatus.value = 'Not logged in.'
+  }
+}
+
+watch(() => isAuthenticated, async () => {
+  await getStatuses()
+}, {
+  immediate: true,
+  deep: true
+})
 </script>
 
 <template>
@@ -12,48 +104,24 @@ import SupportIcon from './icons/IconSupport.vue'
     <template #icon>
       <DocumentationIcon />
     </template>
-    <template #heading>Documentation</template>
-
-    Vue’s
-    <a target="_blank" href="https://vuejs.org/">official documentation</a>
-    provides you with all information you need to get started.
+    <template #heading>API Health Status</template>
+    The backend API is: {{healthStatus}}
   </WelcomeItem>
 
   <WelcomeItem>
     <template #icon>
       <ToolingIcon />
     </template>
-    <template #heading>Tooling</template>
-
-    This project is served and bundled with
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite</a>. The recommended IDE
-    setup is <a href="https://code.visualstudio.com/" target="_blank">VSCode</a> +
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>. If you need to test
-    your components and web pages, check out
-    <a href="https://www.cypress.io/" target="_blank">Cypress</a> and
-    <a href="https://docs.cypress.io/guides/component-testing/introduction" target="_blank"
-      >Cypress Component Testing</a
-    >.
-
-    <br />
-
-    More instructions are available in <code>README.md</code>.
+    <template #heading>Secure Route Status</template>
+    Secure route message: {{secureRouteStatus}}
   </WelcomeItem>
 
   <WelcomeItem>
     <template #icon>
       <EcosystemIcon />
     </template>
-    <template #heading>Ecosystem</template>
-
-    Get official tools and libraries for your project:
-    <a target="_blank" href="https://pinia.vuejs.org/">Pinia</a>,
-    <a target="_blank" href="https://router.vuejs.org/">Vue Router</a>,
-    <a target="_blank" href="https://test-utils.vuejs.org/">Vue Test Utils</a>, and
-    <a target="_blank" href="https://github.com/vuejs/devtools">Vue Dev Tools</a>. If you need more
-    resources, we suggest paying
-    <a target="_blank" href="https://github.com/vuejs/awesome-vue">Awesome Vue</a>
-    a visit.
+    <template #heading>Admin Only Route</template>
+    Admin only message: {{adminOnlyStatus}}
   </WelcomeItem>
 
   <WelcomeItem>

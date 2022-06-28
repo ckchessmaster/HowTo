@@ -1,5 +1,6 @@
 import express from 'express'
-import authMiddleware from './authMiddleware.js'
+import authMiddleware from './authenticationMiddleware.js'
+import { adminOnly } from './authorizationMiddleware.js'
 
 const router = express.Router()
 
@@ -13,6 +14,10 @@ router.get('/health', (req, res) => {
 
 router.get('/secure-route', authMiddleware, (req, res) => {
   res.send('Super secret stuff')
+})
+
+router.get('/admin-only', authMiddleware, adminOnly, (req, res) => {
+  res.send('Admin only stuff!')
 })
 
 export default router

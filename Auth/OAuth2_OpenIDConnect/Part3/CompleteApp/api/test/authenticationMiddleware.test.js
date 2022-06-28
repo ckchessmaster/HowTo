@@ -1,4 +1,4 @@
-import authenticationMiddleware from '../src/authMiddleware.js'
+import authenticationMiddleware from '../src/authenticationMiddleware.js'
 import * as axios from 'axios'
 import { JwksClient } from 'jwks-rsa'
 import jwt from 'jsonwebtoken'

@@ -1,5 +1,5 @@
 import express from 'express'
-import authMiddleware from './authMiddleware.js'
+import authMiddleware from './authenticationMiddleware.js'
 
 const router = express.Router()
 

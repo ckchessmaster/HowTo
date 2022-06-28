@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import config from '@/config'
 import axios from 'axios'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -11,7 +11,7 @@ import EcosystemIcon from './icons/IconEcosystem.vue'
 import CommunityIcon from './icons/IconCommunity.vue'
 import SupportIcon from './icons/IconSupport.vue'
 
-const { getAccessTokenSilently, isAuthenticated, user, isLoading } = useAuth0()
+const { getAccessTokenSilently, isAuthenticated, user } = useAuth0()
 
 let healthStatus = ref('Pending...')
 let secureRouteStatus = ref('Pending...')
